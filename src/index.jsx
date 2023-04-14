@@ -1,4 +1,5 @@
 
+import './style.css'
 const canvas = <canvas></canvas>;
 
 const input = <input type="number" value="1" />;
@@ -34,6 +35,16 @@ input.$parent(document.body);
          gl_Position = vec4(a_position, 0, 1);
      }
  `;
+ function fixFloat(num)
+ {
+    num = num.toString();
+    if(num.indexOf(".") == -1)
+    {
+        return num+".0";
+    }
+    return num;
+    
+ }
  var fragmentShaderSource = (thickness = 0)=>`
      precision mediump float;
      uniform sampler2D u_texture;
@@ -42,13 +53,17 @@ input.$parent(document.body);
             vec2 uv = vec2(fragCoord.x, -fragCoord.y+500.0);
 
             vec4 color = vec4(1.0);
-            for (int i = 0; i < ${thickness}; i++) {
-                for (int j = 0; j < ${thickness}; j++) {
-                  vec2 offset = vec2(float(i - ${Math.floor(thickness/2)}), float(j - ${Math.floor(thickness/2)}));
 
-                  color = min(color,texture2D(u_texture, clamp((uv + offset * 1.0)/500.0,0.0,1.0) ));
+            for (int i = ${-thickness}; i < ${thickness}; i++) {
+                for (int j = ${-thickness}; j < ${thickness}; j++) {
+                    float dist = sqrt(float(i*i + j*j));
+                    if (dist < ${fixFloat(thickness)}) {
+                        vec2 offset = vec2(float(i), float(j));
+                        color = min(color,texture2D(u_texture, clamp((uv + offset * 1.0)/500.0,0.0,1.0) ));
+                    }
                 }
-              }
+            }
+
 
             gl_FragColor = vec4(clamp(color.xyz, 0.0, 1.0),1);
      }
