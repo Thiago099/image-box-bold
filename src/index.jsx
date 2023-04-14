@@ -43,7 +43,15 @@ input.$parent(document.body);
         return num+".0";
     }
     return num;
-    
+ }
+ function fixInt(num)
+ {
+    num = num.toString();
+    if(num.indexOf(".") == -1)
+    {
+        return num;
+    }
+    return num.split(".")[0];
  }
  var fragmentShaderSource = (thickness = 0)=>`
      precision mediump float;
@@ -54,8 +62,8 @@ input.$parent(document.body);
 
             vec4 color = vec4(1.0);
 
-            for (int i = ${-thickness}; i < ${thickness}; i++) {
-                for (int j = ${-thickness}; j < ${thickness}; j++) {
+            for (int i = ${fixInt(-thickness)}; i < ${fixInt(thickness)}; i++) {
+                for (int j = ${fixInt(-thickness)}; j < ${fixInt(thickness)}; j++) {
                     float dist = sqrt(float(i*i + j*j));
                     if (dist < ${fixFloat(thickness)}) {
                         vec2 offset = vec2(float(i), float(j));
